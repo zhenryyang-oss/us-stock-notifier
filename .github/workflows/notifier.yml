@@ -1,41 +1,20 @@
-# 美股每日推送 — GitHub Actions 版
-# 费用：完全免费（每月2000分钟GitHub Actions额度）
-#
-# 部署：push到GitHub私有仓库，设置SCT_KEY Secret即可
-
 name: US Stock Notifier
 
 on:
-  # 每天 UTC 0:00 = 北京时间 8:00（晨间简报 + 注册今日事件监控）
   schedule:
     - cron: "0 0 * * *"
-
-  # 事件日高频监控：每30分钟跑一次，检查事件是否已结束
-  # 覆盖北京时间 12:00 ~ 04:00(next day)，共16小时 = 32次/天
-  - cron: "*/30 4-19 * * *"
-
-  # 手动触发
+    - cron: "*/30 4-19 * * *"
   workflow_dispatch:
-    inputs:
-      mode:
-        description: "模式"
-        required: false
-        default: "auto"
-        type: choice
-        options: [morning, close, event, summary, auto]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Run notifier
         env:
           SCT_KEY: ${{ secrets.SCT_KEY }}
